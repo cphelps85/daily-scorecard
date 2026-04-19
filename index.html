@@ -479,7 +479,10 @@ function render() {
 
 // ── TODAY ─────────────────────────────────────────────────────────────
 function renderToday() {
-  const el = document.getElementById('view-today');
+  // Replace element with a fresh clone to strip any stacked event listeners
+  const old = document.getElementById('view-today');
+  const el  = old.cloneNode(false);
+  old.parentNode.replaceChild(el, old);
   let html = '';
 
   // Morning
@@ -679,7 +682,9 @@ function attachTodayEvents(el) {
 
 // ── HISTORY ───────────────────────────────────────────────────────────
 function renderHistory() {
-  const el = document.getElementById('view-history');
+  const old = document.getElementById('view-history');
+  const el  = old.cloneNode(false);
+  old.parentNode.replaceChild(el, old);
   let html = '';
 
   // Sobriety milestone
@@ -817,7 +822,9 @@ function calcTriggerCounts() {
 
 // ── SETTINGS ──────────────────────────────────────────────────────────
 function renderSettings() {
-  const el = document.getElementById('view-settings');
+  const old = document.getElementById('view-settings');
+  const el  = old.cloneNode(false);
+  old.parentNode.replaceChild(el, old);
   let html = '';
 
   html += `<div class="section-head">Running Schedule</div>`;
