@@ -568,6 +568,12 @@ function renderToday() {
     ${done ? '✓ Day logged' : allAnswered ? "Submit Today's Check-In" : `${total - filled} items remaining…`}
   </button>`;
 
+  if (IS_DEV) {
+    html += `<button id="reset-today-btn" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px dashed #e65c00;background:transparent;color:#e65c00;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">
+      ⚠️ DEV: Reset today's data
+    </button>`;
+  }
+
   el.innerHTML = html;
   attachTodayEvents(el);
 }
@@ -676,6 +682,17 @@ function attachTodayEvents(el) {
       today.submitted = true;
       await saveToday();
       renderToday();
+    });
+  }
+
+  const resetBtn = el.querySelector('#reset-today-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      if (confirm('Reset all of today\'s data back to zero?')) {
+        today = freshToday();
+        await saveToday();
+        renderToday();
+      }
     });
   }
 }
