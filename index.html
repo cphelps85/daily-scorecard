@@ -278,13 +278,12 @@ function filledItems() {
   if (today.dayPlanned!==null)   n++;
   if (today.caffeine!==null)     n++;
   MEAL_SLOTS.forEach(m=>{ if(today.meals[m].rating!==null) n++; });
-  if (today.ran!==null)          n++;
   if (today.homeOrg!==null)      n++;
   if (today.weighed!==null)      n++;
   if (today.executedPlan!==null) n++;
   return n;
 }
-function totalItems() { return 3 + MEAL_SLOTS.length + 4; }
+function totalItems() { return 3 + MEAL_SLOTS.length + 3; } // mood,planned,caff + 3meals + homeOrg,weighed,executedPlan
 
 // ── Load / Save ───────────────────────────────────────────────────────
 async function loadUserData() {
