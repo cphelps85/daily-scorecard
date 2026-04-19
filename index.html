@@ -13,31 +13,219 @@
     body {
       background:#09090b; color:#e4e4e7;
       font-family:Georgia,serif; min-height:100vh;
-      padding-bottom:90px; padding-top:env(safe-area-inset-top);
+      padding-bottom:100px; padding-top:env(safe-area-inset-top);
+    }
+    #dev-banner {
+      position:fixed; top:0; left:0; right:0; z-index:9999;
+      background:#e65c00; color:#fff; text-align:center;
+      font-weight:700; font-size:0.85rem; padding:0.4rem 1rem;
+      letter-spacing:0.03em;
     }
     #app { max-width:480px; margin:0 auto; }
-    .header { padding:20px 20px 12px; border-bottom:1px solid #27272a; display:flex; justify-content:space-between; align-items:center; }
+
+    /* ── Header ── */
+    .header { padding:20px 20px 12px; border-bottom:1px solid #27272a; }
+    .header-top { display:flex; justify-content:space-between; align-items:center; }
     .header-title { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
     .header-date  { font-size:12px; color:#71717a; margin-top:2px; }
-    .nav { display:flex; border-bottom:1px solid #27272a; }
+
+    /* ── Sobriety Banner ── */
+    .sobriety-banner {
+      margin:16px 16px 0;
+      background:linear-gradient(135deg,#14532d,#166534);
+      border:1px solid #4ade8044;
+      border-radius:16px; padding:16px 20px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .sobriety-count { font-size:42px; font-weight:700; color:#4ade80; line-height:1; }
+    .sobriety-label { font-size:13px; color:#86efac; font-weight:600; }
+    .sobriety-sub   { font-size:11px; color:#4ade8099; margin-top:3px; }
+
+    /* ── Nav ── */
+    .nav { display:flex; border-bottom:1px solid #27272a; margin-top:16px; }
     .nav-btn { flex:1; padding:12px 0; background:none; border:none; color:#52525b; border-bottom:2px solid transparent; cursor:pointer; font-size:13px; transition:color 0.2s; font-family:Georgia,serif; }
     .nav-btn.active { color:#e4e4e7; border-bottom:2px solid #e4e4e7; }
-    .view { display:none; padding:20px 16px; }
+
+    /* ── Views ── */
+    .view { display:none; padding:16px; }
     .view.active { display:block; }
-    .cat-label { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; padding-left:4px; }
-    .q-card { background:#18181b; border:1px solid #27272a; border-radius:12px; padding:14px; margin-bottom:8px; transition:border 0.2s; }
-    .q-card.yes { border-color:rgba(74,222,128,0.33); }
-    .q-card.no  { border-color:rgba(248,113,113,0.33); }
-    .q-text { font-size:13px; margin-bottom:10px; display:flex; gap:8px; align-items:flex-start; line-height:1.5; }
-    .q-btn { flex:1; padding:8px 0; border-radius:8px; border:none; background:#27272a; color:#a1a1aa; font-weight:700; font-size:13px; cursor:pointer; transition:all 0.15s; font-family:Georgia,serif; }
-    .q-btn.yes-active { background:#4ade80; color:#052e16; }
-    .q-btn.no-active  { background:#f87171; color:#450a0a; }
-    .q-btn:disabled { cursor:default; }
-    .result-box { border-radius:16px; padding:28px 20px; text-align:center; margin-bottom:20px; border:1px solid transparent; }
-    .intro-box { background:#18181b; border-radius:16px; padding:16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
-    .submit-btn { width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; font-size:15px; transition:all 0.2s; margin-top:8px; font-family:Georgia,serif; }
+
+    /* ── Section headers ── */
+    .section-head {
+      font-size:11px; font-weight:700; letter-spacing:2px;
+      text-transform:uppercase; color:#52525b;
+      margin:20px 0 10px; padding-left:2px;
+    }
+    .section-head:first-child { margin-top:4px; }
+
+    /* ── Cards ── */
+    .card {
+      background:#18181b; border:1px solid #27272a;
+      border-radius:12px; padding:14px 16px; margin-bottom:8px;
+    }
+    .card-title { font-size:13px; font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .card-title .emoji { font-size:16px; }
+
+    /* ── Scale buttons ── */
+    .scale-row { display:flex; gap:8px; }
+    .scale-btn {
+      flex:1; padding:9px 4px; border-radius:8px; border:none;
+      background:#27272a; color:#71717a; font-size:12px; font-weight:700;
+      cursor:pointer; transition:all 0.15s; font-family:Georgia,serif;
+    }
+    .scale-btn.good      { background:#14532d; color:#4ade80; }
+    .scale-btn.okay      { background:#422006; color:#fbbf24; }
+    .scale-btn.struggled { background:#450a0a; color:#f87171; }
+
+    /* ── Trigger chips ── */
+    .trigger-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .trigger-chip {
+      padding:5px 10px; border-radius:99px; border:1px solid #3f3f46;
+      background:#27272a; color:#a1a1aa; font-size:11px; cursor:pointer;
+      font-family:Georgia,serif; transition:all 0.15s;
+    }
+    .trigger-chip.active { background:#450a0a; border-color:#f8717188; color:#f87171; }
+
+    /* ── Yes/No toggle ── */
+    .yn-row { display:flex; gap:8px; }
+    .yn-btn {
+      flex:1; padding:9px; border-radius:8px; border:none;
+      background:#27272a; color:#71717a; font-weight:700; font-size:13px;
+      cursor:pointer; transition:all 0.15s; font-family:Georgia,serif;
+    }
+    .yn-btn.yes-active { background:#14532d; color:#4ade80; }
+    .yn-btn.no-active  { background:#450a0a; color:#f87171; }
+
+    /* ── Weight direction ── */
+    .weight-row { display:flex; gap:8px; margin-top:10px; }
+    .weight-btn {
+      flex:1; padding:9px; border-radius:8px; border:none;
+      background:#27272a; color:#71717a; font-weight:700; font-size:13px;
+      cursor:pointer; transition:all 0.15s; font-family:Georgia,serif;
+    }
+    .weight-btn.up-active   { background:#450a0a; color:#f87171; }
+    .weight-btn.same-active { background:#1c1917; color:#a8a29e; border:1px solid #44403c; }
+    .weight-btn.down-active { background:#14532d; color:#4ade80; }
+
+    /* ── Caffeine tracker ── */
+    .caff-row { display:flex; align-items:center; gap:12px; }
+    .caff-count { font-size:28px; font-weight:700; min-width:32px; text-align:center; }
+    .caff-count.over { color:#f87171; }
+    .caff-count.ok   { color:#4ade80; }
+    .caff-btn {
+      width:36px; height:36px; border-radius:8px; border:none;
+      background:#27272a; color:#e4e4e7; font-size:18px; font-weight:700;
+      cursor:pointer; font-family:Georgia,serif;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .caff-btn:disabled { opacity:0.3; cursor:default; }
+
+    /* ── Running ── */
+    .run-week { display:flex; gap:6px; margin-bottom:12px; }
+    .run-day {
+      flex:1; text-align:center; border-radius:10px; padding:8px 4px;
+      border:1px solid #27272a; background:#18181b;
+    }
+    .run-day .day-label { font-size:10px; color:#52525b; margin-bottom:4px; }
+    .run-day .day-dot   { font-size:18px; line-height:1; }
+    .run-day.target    { border-color:#60a5fa44; background:#172554; }
+    .run-day.target .day-label { color:#93c5fd; }
+    .run-day.completed { border-color:#4ade8044; background:#14532d; }
+    .run-day.completed .day-label { color:#86efac; }
+    .run-day.today-marker { border-color:#e4e4e744; }
+    .run-actions { display:flex; gap:8px; }
+    .run-btn {
+      flex:1; padding:9px; border-radius:8px; border:none;
+      background:#27272a; color:#a1a1aa; font-size:12px; font-weight:700;
+      cursor:pointer; font-family:Georgia,serif; transition:all 0.15s;
+    }
+    .run-btn.primary { background:#172554; color:#60a5fa; }
+    .run-btn.success { background:#14532d; color:#4ade80; }
+    .run-btn.undo    { flex:0; padding:9px 14px; }
+
+    /* ── Add snack ── */
+    .add-snack-btn {
+      width:100%; padding:10px; border-radius:10px;
+      border:1px dashed #3f3f46; background:transparent;
+      color:#52525b; font-size:12px; font-weight:700;
+      cursor:pointer; font-family:Georgia,serif; margin-bottom:8px;
+      transition:all 0.15s;
+    }
+    .snack-remove {
+      background:none; border:none; color:#52525b; font-size:16px;
+      cursor:pointer; padding:0 4px; line-height:1; margin-left:auto;
+    }
+
+    /* ── Mood ── */
+    .mood-row { display:flex; gap:6px; }
+    .mood-btn {
+      flex:1; padding:10px 4px; border-radius:8px; border:1px solid #27272a;
+      background:#18181b; font-size:20px; cursor:pointer; text-align:center;
+      transition:all 0.15s;
+    }
+    .mood-btn.active { border-color:#a78bfa88; background:#2e1065; }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width:100%; padding:16px; border-radius:12px; border:none;
+      font-weight:700; font-size:15px; transition:all 0.2s;
+      margin-top:16px; font-family:Georgia,serif;
+    }
     .submit-btn.ready   { background:#e4e4e7; color:#09090b; cursor:pointer; }
+    .submit-btn.done    { background:#14532d; color:#4ade80; cursor:default; }
     .submit-btn.waiting { background:#27272a; color:#52525b; cursor:default; }
+
+    /* ── History ── */
+    .week-strip { display:flex; gap:6px; margin-bottom:24px; }
+    .week-day {
+      flex:1; text-align:center; border-radius:10px; padding:10px 4px;
+      border:1px solid #27272a; background:#18181b;
+    }
+    .week-day .wd-label { font-size:10px; color:#71717a; margin-bottom:4px; }
+    .week-day .wd-dot   { font-size:15px; }
+    .week-day .wd-pct   { font-size:10px; font-weight:700; margin-top:3px; }
+    .week-day.today-ring { border-color:#e4e4e744; }
+
+    .hist-card {
+      background:#18181b; border:1px solid #27272a; border-radius:12px;
+      padding:14px 16px; margin-bottom:10px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .hist-icon {
+      width:44px; height:44px; border-radius:10px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:20px;
+    }
+
+    /* ── Trigger chart ── */
+    .trigger-bar-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .trigger-bar-label { font-size:12px; color:#a1a1aa; width:100px; flex-shrink:0; }
+    .trigger-bar-track { flex:1; height:8px; background:#27272a; border-radius:99px; overflow:hidden; }
+    .trigger-bar-fill  { height:100%; background:#f87171; border-radius:99px; }
+    .trigger-bar-count { font-size:11px; color:#71717a; width:24px; text-align:right; }
+
+    /* ── Milestone cards ── */
+    .milestone-row  { display:flex; gap:10px; margin-bottom:8px; }
+    .milestone-card { flex:1; background:#18181b; border:1px solid #27272a; border-radius:12px; padding:14px 12px; text-align:center; }
+    .milestone-val  { font-size:26px; font-weight:700; }
+    .milestone-label{ font-size:11px; color:#71717a; margin-top:3px; }
+
+    /* ── Settings ── */
+    .setting-row {
+      background:#18181b; border:1px solid #27272a; border-radius:12px;
+      padding:14px 16px; margin-bottom:8px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .setting-label { font-size:13px; }
+    .setting-sub   { font-size:11px; color:#71717a; margin-top:2px; }
+    .run-day-toggle { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+    .rdt-btn {
+      padding:6px 12px; border-radius:8px; border:1px solid #3f3f46;
+      background:#27272a; color:#71717a; font-size:12px; cursor:pointer;
+      font-family:Georgia,serif; transition:all 0.15s;
+    }
+    .rdt-btn.active { background:#172554; border-color:#60a5fa88; color:#60a5fa; }
+
+    .empty { text-align:center; color:#52525b; padding:40px 0; font-size:13px; }
   </style>
 </head>
 <body>
@@ -53,10 +241,9 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc }
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────────────────
 const firebaseConfig = {
   apiKey:            "AIzaSyAu5PZP0rRuTsWlk-5zF0GOAMbUGjYBYQ0",
   authDomain:        "daily-scorecard-62031.firebaseapp.com",
@@ -65,110 +252,133 @@ const firebaseConfig = {
   messagingSenderId: "647221313494",
   appId:             "1:647221313494:web:f4755a965e75b044a46e77"
 };
-// ─────────────────────────────────────────────────────────────────────────────
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const IS_DEV    = window.location.protocol === 'file:';
+const DB_PREFIX = IS_DEV ? 'dev_' : '';
 
-const DEFAULT_QUESTIONS = [
-  { id:"q1",  category:"nutrition", emoji:"🥗", text:"Did you eat a vegetable with at least one meal?" },
-  { id:"q2",  category:"nutrition", emoji:"🧂", text:"Did you avoid high-sodium or heavily processed foods?" },
-  { id:"q3",  category:"nutrition", emoji:"💧", text:"Did you drink enough water today?" },
-  { id:"q4",  category:"nutrition", emoji:"🛑", text:"Did you avoid late-night snacking?" },
-  { id:"q5",  category:"movement",  emoji:"🏃", text:"Did you get intentional exercise or movement?" },
-  { id:"q6",  category:"movement",  emoji:"🚶", text:"Did you take breaks from sitting throughout the day?" },
-  { id:"q7",  category:"sleep",     emoji:"😴", text:"Did you get at least 7 hours of sleep last night?" },
-  { id:"q8",  category:"sleep",     emoji:"📵", text:"Did you avoid screens for 30+ min before bed?" },
-  { id:"q9",  category:"mind",      emoji:"📖", text:"Did you read, learn, or practice a skill today?" },
-  { id:"q10", category:"mind",      emoji:"🧘", text:"Did you take a moment to decompress or breathe intentionally?" },
-];
+const fbApp = initializeApp(firebaseConfig);
+const auth  = getAuth(fbApp);
+const db    = getFirestore(fbApp);
 
-const CATEGORY_META = {
-  nutrition: { label:"Nutrition", color:"#4ade80" },
-  movement:  { label:"Movement",  color:"#60a5fa" },
-  sleep:     { label:"Sleep",     color:"#a78bfa" },
-  mind:      { label:"Mind",      color:"#fbbf24" },
-};
-const CAT_EMOJIS = { nutrition:"🥗", movement:"🏃", sleep:"😴", mind:"📖" };
+if (IS_DEV) {
+  const banner = document.createElement('div');
+  banner.id = 'dev-banner';
+  banner.textContent = '⚠️ DEV MODE — test data only';
+  document.body.prepend(banner);
+}
 
-function todayKey() { return new Date().toISOString().slice(0,10); }
+// ── Constants ─────────────────────────────────────────────────────────
+const SOBRIETY_START  = new Date('2025-11-05T00:00:00');
+const TRIGGERS        = ['Stressed','Tired','Bored','Social','Just wanted it','Other'];
+const MOODS           = ['😔','😕','😐','🙂','😄'];
+const DEFAULT_RUN_DAYS = [3, 5, 0]; // Wed, Fri, Sun
+const DAY_NAMES       = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MEAL_SLOTS      = ['Breakfast','Lunch','Dinner'];
+
+// ── App state ─────────────────────────────────────────────────────────
+let user        = null;
+let currentView = 'today';
+let today       = {};
+let history     = {};
+let settings    = {};
+
+// ── Firestore helpers ─────────────────────────────────────────────────
+const uDoc = (...path) => doc(db, DB_PREFIX + 'users', user.uid, ...path);
+const uCol = (name)    => collection(db, DB_PREFIX + 'users', user.uid, name);
+
+function todayKey() { return new Date().toISOString().slice(0, 10); }
+function dateKey(d)  { return d.toISOString().slice(0, 10); }
 function weekKeys() {
   const keys = [];
-  for (let i=6; i>=0; i--) {
-    const d = new Date(); d.setDate(d.getDate()-i);
-    keys.push(d.toISOString().slice(0,10));
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    keys.push(dateKey(d));
   }
   return keys;
 }
-function getDayLabel(s) {
-  return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(s+"T12:00:00").getDay()];
+function getDayLabel(s) { return DAY_NAMES[new Date(s + 'T12:00:00').getDay()]; }
+
+// ── Sobriety ──────────────────────────────────────────────────────────
+function sobrietyDays() {
+  return Math.floor((new Date() - SOBRIETY_START) / 86400000);
 }
+
+// ── Score colour ──────────────────────────────────────────────────────
 function scoreColor(pct) {
-  if (pct >= 0.75) return { bg:"#14532d", text:"#4ade80", label:"Great Day",  emoji:"🌟" };
-  if (pct >= 0.5)  return { bg:"#713f12", text:"#fbbf24", label:"Decent Day", emoji:"👍" };
-  return                   { bg:"#450a0a", text:"#f87171", label:"Rough Day",  emoji:"💪" };
+  if (pct >= 0.75) return { bg:'#14532d', text:'#4ade80', label:'Great Day',  emoji:'🌟' };
+  if (pct >= 0.5)  return { bg:'#713f12', text:'#fbbf24', label:'Decent Day', emoji:'👍' };
+  return                   { bg:'#450a0a', text:'#f87171', label:'Rough Day',  emoji:'💪' };
 }
 
-// ── State ──
-let user      = null;
-let questions = [];
-let history   = {};
-let todayData = { answers:{}, submitted:false };
-let currentView = "checkin";
-let editingId   = null;
+// ── Default today ─────────────────────────────────────────────────────
+function freshToday() {
+  return {
+    mood: null, dayPlanned: null, caffeine: 0,
+    meals: {
+      Breakfast: { rating:null, trigger:null },
+      Lunch:     { rating:null, trigger:null },
+      Dinner:    { rating:null, trigger:null },
+    },
+    snacks: [], ran: null, otherMove: null,
+    homeOrg: null, weighed: null, weightDir: null,
+    submitted: false,
+  };
+}
 
-// ── Firestore helpers ──
-const uDoc = (...path) => doc(db, "users", user.uid, ...path);
-const uCol = (name)    => collection(db, "users", user.uid, name);
-
+// ── Load data ─────────────────────────────────────────────────────────
 async function loadUserData() {
-  // Questions
-  const qSnap = await getDocs(uCol("questions"));
-  if (qSnap.empty) {
-    questions = DEFAULT_QUESTIONS;
-    await saveQuestions();
-  } else {
-    questions = [];
-    qSnap.forEach(d => questions.push(d.data()));
-    questions.sort((a,b) => (a.order||0) - (b.order||0));
-  }
-  // History
-  const hSnap = await getDocs(uCol("checkins"));
+  const sSnap = await getDoc(uDoc('settings', 'prefs'));
+  settings = sSnap.exists() ? sSnap.data() : { runDays: DEFAULT_RUN_DAYS };
+  if (!settings.runDays) settings.runDays = DEFAULT_RUN_DAYS;
+
+  const hSnap = await getDocs(uCol('checkins'));
   history = {};
   hSnap.forEach(d => { history[d.id] = d.data(); });
-  // Today
-  const tSnap = await getDoc(uDoc("checkins", todayKey()));
+
+  const tSnap = await getDoc(uDoc('checkins', todayKey()));
   if (tSnap.exists()) {
-    const data = tSnap.data();
-    todayData = { answers: data.answers||{}, submitted: data.submitted||false };
-    history[todayKey()] = data;
+    today = { ...freshToday(), ...tSnap.data() };
+    if (!today.meals) today.meals = freshToday().meals;
+    MEAL_SLOTS.forEach(m => { if (!today.meals[m]) today.meals[m] = { rating:null, trigger:null }; });
+    if (!today.snacks) today.snacks = [];
   } else {
-    todayData = { answers:{}, submitted:false };
+    today = freshToday();
   }
 }
 
-async function saveQuestions() {
-  const snap = await getDocs(uCol("questions"));
-  for (const d of snap.docs) await deleteDoc(d.ref);
-  for (let i=0; i<questions.length; i++) {
-    await setDoc(doc(db,"users",user.uid,"questions",questions[i].id), { ...questions[i], order:i });
-  }
-}
-
-async function saveTodayCheckin() {
-  const yesCount = questions.filter(q => todayData.answers[q.id]===true).length;
-  const pct = questions.length > 0 ? yesCount / questions.length : 0;
-  const data = { answers:todayData.answers, submitted:todayData.submitted, pct, yes:yesCount, total:questions.length, date:todayKey() };
-  await setDoc(uDoc("checkins", todayKey()), data);
+// ── Save ──────────────────────────────────────────────────────────────
+async function saveToday() {
+  const filled = filledItems();
+  const total  = totalItems();
+  const pct    = total > 0 ? filled / total : 0;
+  const data   = { ...today, pct, filled, total, date: todayKey() };
+  await setDoc(uDoc('checkins', todayKey()), data);
   history[todayKey()] = data;
 }
 
-// ── Auth ──
+async function saveSettings() {
+  await setDoc(uDoc('settings', 'prefs'), settings);
+}
+
+// ── Progress ──────────────────────────────────────────────────────────
+function filledItems() {
+  let n = 0;
+  if (today.mood !== null)       n++;
+  if (today.dayPlanned !== null) n++;
+  if (today.caffeine !== null)   n++;   // caffeine always counts (0 is a valid answer)
+  MEAL_SLOTS.forEach(m => { if (today.meals[m].rating !== null) n++; });
+  if (today.ran !== null)        n++;
+  if (today.homeOrg !== null)    n++;
+  if (today.weighed !== null)    n++;
+  return n;
+}
+function totalItems() { return 3 + MEAL_SLOTS.length + 3; } // mood,planned,caff + 3meals + ran,homeOrg,weighed
+
+// ── Auth ──────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async (u) => {
   user = u;
   if (u) {
-    showLoading("Loading your data…");
+    showLoading('Loading your scorecard…');
     await loadUserData();
     renderShell();
     render();
@@ -178,18 +388,21 @@ onAuthStateChanged(auth, async (u) => {
 });
 
 function showLoading(msg) {
-  document.getElementById("app").innerHTML = `
+  document.getElementById('app').innerHTML = `
     <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#71717a;gap:16px">
       <div style="font-size:32px">✦</div><div style="font-size:14px">${msg}</div>
     </div>`;
 }
 
 function renderLogin() {
-  document.getElementById("app").innerHTML = `
+  document.getElementById('app').innerHTML = `
     <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
       <div style="font-size:48px;margin-bottom:16px">✦</div>
       <div style="font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px">Daily Scorecard</div>
-      <div style="font-size:14px;color:#71717a;margin-bottom:40px;line-height:1.6">Track your nutrition, movement,<br>sleep & mind — every day.</div>
+      <div style="font-size:14px;color:#71717a;margin-bottom:12px;line-height:1.6">Your daily wins, habits &amp; goals.</div>
+      <div style="background:#14532d;border:1px solid #4ade8044;border-radius:12px;padding:12px 20px;margin-bottom:32px;font-size:13px;color:#86efac">
+        🌿 ${sobrietyDays()} days sober — keep going
+      </div>
       <button id="signin-btn" style="display:flex;align-items:center;gap:12px;padding:14px 24px;background:#e4e4e7;color:#09090b;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">
         <svg width="20" height="20" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -200,250 +413,454 @@ function renderLogin() {
         Sign in with Google
       </button>
     </div>`;
-  document.getElementById("signin-btn").addEventListener("click", async () => {
+  document.getElementById('signin-btn').addEventListener('click', async () => {
     try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-    catch(e) { alert("Sign-in failed: " + e.message); }
+    catch(e) { alert('Sign-in failed: ' + e.message); }
   });
 }
 
+// ── Shell ─────────────────────────────────────────────────────────────
 function renderShell() {
-  document.getElementById("app").innerHTML = `
-    <div class="header">
-      <div>
-        <div class="header-title">Daily Scorecard</div>
-        <div class="header-date">${new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</div>
+  const topPad = IS_DEV ? 'padding-top:36px;' : '';
+  document.getElementById('app').innerHTML = `
+    <div style="${topPad}">
+      <div class="header">
+        <div class="header-top">
+          <div>
+            <div class="header-title">Daily Scorecard</div>
+            <div class="header-date">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            ${user.photoURL ? `<img src="${user.photoURL}" id="avatar" style="width:30px;height:30px;border-radius:50%;cursor:pointer" title="Sign out">` : ''}
+            <div style="font-size:28px">✦</div>
+          </div>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        ${user.photoURL ? `<img id="avatar" src="${user.photoURL}" style="width:30px;height:30px;border-radius:50%;cursor:pointer" title="Sign out">` : ""}
-        <div style="font-size:28px">✦</div>
+      <div class="sobriety-banner">
+        <div class="sobriety-count">${sobrietyDays()}</div>
+        <div>
+          <div class="sobriety-label">🌿 Days Sober</div>
+          <div class="sobriety-sub">Since November 5, 2025 · You've got this</div>
+        </div>
       </div>
-    </div>
-    <div class="nav">
-      <button class="nav-btn active" data-view="checkin">Check-In</button>
-      <button class="nav-btn" data-view="history">History</button>
-      <button class="nav-btn" data-view="settings">Questions</button>
-    </div>
-    <div id="view-checkin" class="view active"></div>
-    <div id="view-history" class="view"></div>
-    <div id="view-settings" class="view"></div>`;
+      <div class="nav">
+        <button class="nav-btn active" data-view="today">Today</button>
+        <button class="nav-btn" data-view="history">History</button>
+        <button class="nav-btn" data-view="settings">Settings</button>
+      </div>
+      <div id="view-today"    class="view active"></div>
+      <div id="view-history"  class="view"></div>
+      <div id="view-settings" class="view"></div>
+    </div>`;
 
-  const avatar = document.getElementById("avatar");
-  if (avatar) avatar.addEventListener("click", () => { if (confirm("Sign out?")) signOut(auth); });
+  const avatar = document.getElementById('avatar');
+  if (avatar) avatar.addEventListener('click', () => { if (confirm('Sign out?')) signOut(auth); });
 
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
       currentView = btn.dataset.view;
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      document.getElementById("view-"+currentView).classList.add("active");
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + currentView).classList.add('active');
       render();
     });
   });
 }
 
 function render() {
-  if (currentView==="checkin")  renderCheckin();
-  if (currentView==="history")  renderHistory();
-  if (currentView==="settings") renderSettings();
+  if (currentView === 'today')    renderToday();
+  if (currentView === 'history')  renderHistory();
+  if (currentView === 'settings') renderSettings();
 }
 
-// ── Check-In ──
-function renderCheckin() {
-  const el = document.getElementById("view-checkin");
-  const { answers, submitted } = todayData;
-  const yesCount = questions.filter(q => answers[q.id]===true).length;
-  const pct = questions.length > 0 ? yesCount/questions.length : 0;
-  const col = scoreColor(pct);
+// ── TODAY ─────────────────────────────────────────────────────────────
+function renderToday() {
+  const el = document.getElementById('view-today');
+  let html = '';
 
-  let html = submitted
-    ? `<div class="result-box" style="background:${col.bg};border-color:${col.text}33">
-        <div style="font-size:48px;margin-bottom:8px">${col.emoji}</div>
-        <div style="font-size:22px;font-weight:700;color:${col.text}">${col.label}</div>
-        <div style="font-size:14px;color:#a1a1aa;margin-top:6px">${yesCount} of ${questions.length} habits hit</div>
-        <div style="margin-top:16px;height:8px;background:#27272a;border-radius:99px;overflow:hidden">
-          <div style="height:100%;width:${pct*100}%;background:${col.text};border-radius:99px;transition:width 0.8s ease"></div>
-        </div>
-      </div>`
-    : `<div class="intro-box">
-        <div style="font-size:32px">📋</div>
-        <div><div style="font-size:14px;font-weight:600">How was your day?</div>
-        <div style="font-size:12px;color:#71717a">Answer each habit below, then tap Submit</div></div>
-      </div>`;
+  // Morning
+  html += `<div class="section-head">Morning</div>`;
+  html += `<div class="card">
+    <div class="card-title"><span class="emoji">🧠</span> How are you feeling today?</div>
+    <div class="mood-row">
+      ${MOODS.map((m, i) => `<button class="mood-btn ${today.mood === i ? 'active' : ''}" data-action="mood" data-val="${i}">${m}</button>`).join('')}
+    </div>
+  </div>`;
+  html += `<div class="card">
+    <div class="card-title"><span class="emoji">📅</span> Do you have a plan for today?</div>
+    <div class="yn-row">
+      <button class="yn-btn ${today.dayPlanned === true ? 'yes-active' : ''}" data-action="dayPlanned" data-val="true">✓ Yes</button>
+      <button class="yn-btn ${today.dayPlanned === false ? 'no-active' : ''}" data-action="dayPlanned" data-val="false">✗ No</button>
+    </div>
+  </div>`;
 
-  Object.keys(CATEGORY_META).forEach(cat => {
-    const qs = questions.filter(q => q.category===cat);
-    if (!qs.length) return;
-    html += `<div style="margin-bottom:20px">
-      <div class="cat-label" style="color:${CATEGORY_META[cat].color}">${CATEGORY_META[cat].label}</div>`;
-    qs.forEach(q => {
-      const ans = answers[q.id];
-      html += `<div class="q-card ${ans===true?"yes":ans===false?"no":""}">
-        <div class="q-text"><span>${q.emoji}</span><span>${q.text}</span></div>
-        <div style="display:flex;gap:8px">
-          <button class="q-btn ${ans===true?"yes-active":""}" ${submitted?"disabled":""} data-id="${q.id}" data-val="true">✓ Yes</button>
-          <button class="q-btn ${ans===false?"no-active":""}" ${submitted?"disabled":""} data-id="${q.id}" data-val="false">✗ No</button>
-        </div>
+  // Caffeine
+  html += `<div class="section-head">Caffeine</div>`;
+  const caffOk = today.caffeine <= 1;
+  html += `<div class="card">
+    <div class="card-title">
+      <span class="emoji">☕</span> Caffeinated drinks today
+      <span style="font-size:11px;color:${caffOk ? '#4ade80' : '#f87171'};margin-left:auto">${caffOk ? 'Within limit' : 'Over limit'}</span>
+    </div>
+    <div class="caff-row">
+      <button class="caff-btn" data-action="caffDec" ${today.caffeine <= 0 ? 'disabled' : ''}>−</button>
+      <div class="caff-count ${caffOk ? 'ok' : 'over'}">${today.caffeine}</div>
+      <button class="caff-btn" data-action="caffInc">+</button>
+      <span style="font-size:12px;color:#52525b;margin-left:4px">max 1 per day</span>
+    </div>
+  </div>`;
+
+  // Meals & Snacks
+  html += `<div class="section-head">Meals &amp; Snacks</div>`;
+  MEAL_SLOTS.forEach(meal => { html += renderMealCard(meal, today.meals[meal]); });
+  today.snacks.forEach((snack, idx) => { html += renderSnackCard(snack, idx); });
+  html += `<button class="add-snack-btn" data-action="addSnack">+ Add a snack</button>`;
+
+  // Movement
+  html += `<div class="section-head">Movement</div>`;
+  html += renderRunCard();
+  html += `<div class="card">
+    <div class="card-title"><span class="emoji">🚶</span> Any other movement today?</div>
+    <div class="yn-row">
+      <button class="yn-btn ${today.otherMove === true ? 'yes-active' : ''}" data-action="otherMove" data-val="true">✓ Yes</button>
+      <button class="yn-btn ${today.otherMove === false ? 'no-active' : ''}" data-action="otherMove" data-val="false">✗ No</button>
+    </div>
+  </div>`;
+
+  // Weight
+  html += `<div class="section-head">Weight</div>`;
+  html += `<div class="card">
+    <div class="card-title"><span class="emoji">⚖️</span> Did you weigh yourself today?</div>
+    <div class="yn-row">
+      <button class="yn-btn ${today.weighed === true ? 'yes-active' : ''}" data-action="weighed" data-val="true">✓ Yes</button>
+      <button class="yn-btn ${today.weighed === false ? 'no-active' : ''}" data-action="weighed" data-val="false">✗ No</button>
+    </div>
+    ${today.weighed === true ? `<div class="weight-row">
+      <button class="weight-btn ${today.weightDir === 'down' ? 'down-active' : ''}" data-action="weightDir" data-val="down">↓ Down</button>
+      <button class="weight-btn ${today.weightDir === 'same' ? 'same-active' : ''}" data-action="weightDir" data-val="same">→ Same</button>
+      <button class="weight-btn ${today.weightDir === 'up' ? 'up-active' : ''}" data-action="weightDir" data-val="up">↑ Up</button>
+    </div>` : ''}
+  </div>`;
+
+  // Evening
+  html += `<div class="section-head">Evening</div>`;
+  html += `<div class="card">
+    <div class="card-title"><span class="emoji">🏠</span> Did you do something to keep your space organized?</div>
+    <div class="yn-row">
+      <button class="yn-btn ${today.homeOrg === true ? 'yes-active' : ''}" data-action="homeOrg" data-val="true">✓ Yes</button>
+      <button class="yn-btn ${today.homeOrg === false ? 'no-active' : ''}" data-action="homeOrg" data-val="false">✗ No</button>
+    </div>
+  </div>`;
+
+  // Submit
+  const done       = today.submitted;
+  const filled     = filledItems();
+  const total      = totalItems();
+  const allAnswered = filled >= total;
+  html += `<button class="submit-btn ${done ? 'done' : allAnswered ? 'ready' : 'waiting'}" id="submit-btn" ${done || !allAnswered ? 'disabled' : ''}>
+    ${done ? '✓ Day logged' : allAnswered ? "Submit Today's Check-In" : `${total - filled} items remaining…`}
+  </button>`;
+
+  el.innerHTML = html;
+  attachTodayEvents(el);
+}
+
+function renderMealCard(meal, data) {
+  const rating  = data ? data.rating  : null;
+  const trigger = data ? data.trigger : null;
+  const icon    = meal === 'Breakfast' ? '🍳' : meal === 'Lunch' ? '🥗' : '🍽️';
+  return `<div class="card">
+    <div class="card-title"><span class="emoji">${icon}</span> ${meal}</div>
+    <div class="scale-row">
+      <button class="scale-btn ${rating === 'good'      ? 'good'      : ''}" data-action="mealRating" data-meal="${meal}" data-val="good">🟢 Good</button>
+      <button class="scale-btn ${rating === 'okay'      ? 'okay'      : ''}" data-action="mealRating" data-meal="${meal}" data-val="okay">🟡 Okay</button>
+      <button class="scale-btn ${rating === 'struggled' ? 'struggled' : ''}" data-action="mealRating" data-meal="${meal}" data-val="struggled">🔴 Struggled</button>
+    </div>
+    ${rating && rating !== 'good' ? `<div class="trigger-row">
+      <div style="font-size:11px;color:#71717a;width:100%;margin-bottom:2px">What was going on?</div>
+      ${TRIGGERS.map(t => `<button class="trigger-chip ${trigger === t ? 'active' : ''}" data-action="mealTrigger" data-meal="${meal}" data-val="${t}">${t}</button>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+function renderSnackCard(snack, idx) {
+  const rating  = snack.rating;
+  const trigger = snack.trigger;
+  return `<div class="card">
+    <div class="card-title">
+      <span class="emoji">🍎</span> Snack ${idx + 1}
+      <button class="snack-remove" data-action="removeSnack" data-idx="${idx}">✕</button>
+    </div>
+    <div class="scale-row">
+      <button class="scale-btn ${rating === 'good'      ? 'good'      : ''}" data-action="snackRating" data-idx="${idx}" data-val="good">🟢 Good</button>
+      <button class="scale-btn ${rating === 'okay'      ? 'okay'      : ''}" data-action="snackRating" data-idx="${idx}" data-val="okay">🟡 Okay</button>
+      <button class="scale-btn ${rating === 'struggled' ? 'struggled' : ''}" data-action="snackRating" data-idx="${idx}" data-val="struggled">🔴 Struggled</button>
+    </div>
+    ${rating && rating !== 'good' ? `<div class="trigger-row">
+      <div style="font-size:11px;color:#71717a;width:100%;margin-bottom:2px">What was going on?</div>
+      ${TRIGGERS.map(t => `<button class="trigger-chip ${trigger === t ? 'active' : ''}" data-action="snackTrigger" data-idx="${idx}" data-val="${t}">${t}</button>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+function renderRunCard() {
+  const todayDow     = new Date().getDay();
+  const isRunDay     = settings.runDays.includes(todayDow);
+  const thisWeekRuns = weekKeys().filter(k => history[k] && history[k].ran === true).length;
+  const targetRuns   = settings.runDays.length;
+
+  const dayHtml = weekKeys().map(k => {
+    const dow       = new Date(k + 'T12:00:00').getDay();
+    const isTarget  = settings.runDays.includes(dow);
+    const completed = history[k] && history[k].ran === true;
+    const isToday   = k === todayKey();
+    let cls = 'run-day';
+    if (completed) cls += ' completed';
+    else if (isTarget) cls += ' target';
+    if (isToday) cls += ' today-marker';
+    const dot = completed ? '✓' : isTarget ? '🏃' : '·';
+    return `<div class="${cls}"><div class="day-label">${getDayLabel(k)}</div><div class="day-dot">${dot}</div></div>`;
+  }).join('');
+
+  return `<div class="card">
+    <div class="card-title">
+      <span class="emoji">🏃</span> Running
+      <span style="font-size:11px;color:#60a5fa;margin-left:auto">${thisWeekRuns} / ${targetRuns} this week</span>
+    </div>
+    <div class="run-week">${dayHtml}</div>
+    <div class="run-actions">
+      <button class="run-btn ${today.ran === true ? 'success' : 'primary'}" data-action="ran" data-val="true">
+        ${today.ran === true ? '✓ Run logged' : isRunDay ? '🏃 Log today\'s run' : '+ Log a run today'}
+      </button>
+      ${today.ran === true ? `<button class="run-btn undo" data-action="ran" data-val="false">Undo</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function attachTodayEvents(el) {
+  el.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+
+    if      (action === 'mood')        { today.mood        = parseInt(btn.dataset.val); }
+    else if (action === 'dayPlanned')  { today.dayPlanned  = btn.dataset.val === 'true'; }
+    else if (action === 'caffInc')     { today.caffeine    = (today.caffeine || 0) + 1; }
+    else if (action === 'caffDec')     { today.caffeine    = Math.max(0, (today.caffeine || 0) - 1); }
+    else if (action === 'mealRating')  { today.meals[btn.dataset.meal].rating = btn.dataset.val; today.meals[btn.dataset.meal].trigger = null; }
+    else if (action === 'mealTrigger') { today.meals[btn.dataset.meal].trigger = btn.dataset.val; }
+    else if (action === 'snackRating') { const i = parseInt(btn.dataset.idx); today.snacks[i].rating = btn.dataset.val; today.snacks[i].trigger = null; }
+    else if (action === 'snackTrigger'){ today.snacks[parseInt(btn.dataset.idx)].trigger = btn.dataset.val; }
+    else if (action === 'addSnack')    { today.snacks.push({ rating:null, trigger:null }); }
+    else if (action === 'removeSnack') { today.snacks.splice(parseInt(btn.dataset.idx), 1); }
+    else if (action === 'ran')         { today.ran       = btn.dataset.val === 'true'; }
+    else if (action === 'otherMove')   { today.otherMove = btn.dataset.val === 'true'; }
+    else if (action === 'weighed')     { today.weighed   = btn.dataset.val === 'true'; if (!today.weighed) today.weightDir = null; }
+    else if (action === 'weightDir')   { today.weightDir = btn.dataset.val; }
+    else if (action === 'homeOrg')     { today.homeOrg   = btn.dataset.val === 'true'; }
+
+    await saveToday();
+    renderToday();
+  });
+
+  const submitBtn = el.querySelector('#submit-btn');
+  if (submitBtn && !today.submitted) {
+    submitBtn.addEventListener('click', async () => {
+      today.submitted = true;
+      await saveToday();
+      renderToday();
+    });
+  }
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────
+function renderHistory() {
+  const el = document.getElementById('view-history');
+  let html = '';
+
+  // Sobriety milestone
+  html += `<div class="section-head">Milestones</div>`;
+  html += `<div style="background:linear-gradient(135deg,#14532d,#166534);border:1px solid #4ade8044;border-radius:12px;padding:16px 20px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
+    <div style="font-size:40px;font-weight:700;color:#4ade80">${sobrietyDays()}</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#86efac">🌿 Days Sober</div>
+      <div style="font-size:11px;color:#4ade8099;margin-top:2px">Since November 5, 2025 — one day at a time</div>
+    </div>
+  </div>`;
+
+  // Streaks & weekly run count
+  const runStreak   = calcStreak(k => history[k] && history[k].ran === true);
+  const weighStreak = calcStreak(k => history[k] && history[k].weighed === true);
+  const runsThisWeek = weekKeys().filter(k => history[k] && history[k].ran === true).length;
+  html += `<div class="milestone-row">
+    <div class="milestone-card">
+      <div class="milestone-val" style="color:#60a5fa">${runsThisWeek}/${settings.runDays.length}</div>
+      <div class="milestone-label">Runs this week</div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-val" style="color:#60a5fa">${runStreak}</div>
+      <div class="milestone-label">Run streak</div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-val" style="color:#a78bfa">${weighStreak}</div>
+      <div class="milestone-label">Weigh-in streak</div>
+    </div>
+  </div>`;
+
+  // Weight trend
+  const wt = calcWeightTrend();
+  if (wt.total > 0) {
+    html += `<div class="card" style="margin-bottom:8px">
+      <div class="card-title"><span class="emoji">⚖️</span> Weight trend — last 30 days</div>
+      <div style="display:flex;gap:16px;justify-content:center;padding:4px 0">
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">${wt.down}</div><div style="font-size:11px;color:#71717a">↓ down</div></div>
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#a8a29e">${wt.same}</div><div style="font-size:11px;color:#71717a">→ same</div></div>
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#f87171">${wt.up}</div><div style="font-size:11px;color:#71717a">↑ up</div></div>
+      </div>
+    </div>`;
+  }
+
+  // Eating triggers
+  const triggers = calcTriggerCounts();
+  if (Object.keys(triggers).length > 0) {
+    html += `<div class="section-head">Eating Pattern Triggers</div>`;
+    html += `<div class="card">
+      <div style="font-size:12px;color:#71717a;margin-bottom:14px">When you rated a meal or snack Okay / Struggled, here's what was going on:</div>`;
+    const max = Math.max(...Object.values(triggers));
+    Object.entries(triggers).sort((a, b) => b[1] - a[1]).forEach(([t, count]) => {
+      html += `<div class="trigger-bar-row">
+        <div class="trigger-bar-label">${t}</div>
+        <div class="trigger-bar-track"><div class="trigger-bar-fill" style="width:${max > 0 ? Math.round(count / max * 100) : 0}%"></div></div>
+        <div class="trigger-bar-count">${count}</div>
       </div>`;
     });
     html += `</div>`;
-  });
-
-  if (!submitted) {
-    const answered = questions.every(q => answers[q.id]!==undefined);
-    const remaining = questions.filter(q => answers[q.id]===undefined).length;
-    html += `<button class="submit-btn ${answered?"ready":"waiting"}" id="submit-btn" ${answered?"":"disabled"}>
-      ${answered ? "Submit Today's Check-In" : `Answer all ${remaining} remaining…`}
-    </button>`;
   }
 
-  el.innerHTML = html;
-
-  el.querySelectorAll(".q-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      const val = btn.dataset.val === "true";
-      todayData.answers[id] = val;
-      renderCheckin();
-      await saveTodayCheckin();
-    });
-  });
-
-  const submitBtn = el.querySelector("#submit-btn");
-  if (submitBtn) {
-    submitBtn.addEventListener("click", async () => {
-      todayData.submitted = true;
-      await saveTodayCheckin();
-      renderCheckin();
-    });
-  }
-}
-
-// ── History ──
-function renderHistory() {
-  const el = document.getElementById("view-history");
-  let html = `<div style="font-size:13px;font-weight:700;letter-spacing:1.5px;color:#71717a;text-transform:uppercase;margin-bottom:16px">Last 7 Days</div>
-    <div style="display:flex;gap:8px;margin-bottom:28px">`;
-
+  // 7-day strip
+  html += `<div class="section-head">Last 7 Days</div>`;
+  html += `<div class="week-strip">`;
   weekKeys().forEach(k => {
     const d = history[k];
-    const isToday = k===todayKey();
     const p = d ? d.pct : null;
-    const col = p!==null ? scoreColor(p) : null;
-    const border = isToday ? "2px solid #e4e4e7" : `1px solid ${col?col.text+"44":"#27272a"}`;
-    html += `<div style="flex:1;text-align:center;background:${col?col.bg:"#18181b"};border:${border};border-radius:10px;padding:12px 4px">
-      <div style="font-size:10px;color:#71717a;margin-bottom:4px">${getDayLabel(k)}</div>
-      <div style="font-size:16px">${p===null?"–":p>=0.75?"🟢":p>=0.5?"🟡":"🔴"}</div>
-      ${d?`<div style="font-size:10px;color:${col.text};margin-top:4px;font-weight:700">${Math.round(p*100)}%</div>`:""}
+    const col = p !== null ? scoreColor(p) : null;
+    html += `<div class="week-day ${k === todayKey() ? 'today-ring' : ''}">
+      <div class="wd-label">${getDayLabel(k)}</div>
+      <div class="wd-dot">${p === null ? '–' : p >= 0.75 ? '🟢' : p >= 0.5 ? '🟡' : '🔴'}</div>
+      ${d ? `<div class="wd-pct" style="color:${col.text}">${Math.round(p * 100)}%</div>` : ''}
     </div>`;
   });
   html += `</div>`;
 
+  // Full log
+  html += `<div class="section-head">Full Log</div>`;
   const keys = Object.keys(history).sort().reverse();
   if (!keys.length) {
-    html += `<div style="text-align:center;color:#52525b;padding:40px 0">No history yet — complete your first check-in!</div>`;
+    html += `<div class="empty">No history yet — complete your first check-in!</div>`;
   } else {
     keys.forEach(k => {
       const d = history[k];
       if (!d) return;
-      const col = scoreColor(d.pct);
-      const dateStr = new Date(k+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
-      html += `<div style="background:#18181b;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;border:1px solid #27272a">
-        <div style="width:44px;height:44px;border-radius:10px;background:${col.bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid ${col.text}44">${col.emoji}</div>
+      const col     = scoreColor(d.pct || 0);
+      const dateStr = new Date(k + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+      const badges  = [d.ran ? '🏃' : '', d.weighed ? '⚖️' : ''].filter(Boolean).join(' ');
+      html += `<div class="hist-card">
+        <div class="hist-icon" style="background:${col.bg};border:1px solid ${col.text}44">${col.emoji}</div>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:600">${dateStr}</div>
-          <div style="font-size:12px;color:#71717a;margin-top:2px">${d.yes} of ${d.total} habits</div>
+          <div style="font-size:11px;color:#71717a;margin-top:2px">${d.filled || 0} of ${d.total || 0} habits ${badges}</div>
         </div>
-        <div style="font-size:16px;font-weight:700;color:${col.text}">${Math.round(d.pct*100)}%</div>
+        <div style="font-size:16px;font-weight:700;color:${col.text}">${Math.round((d.pct || 0) * 100)}%</div>
       </div>`;
     });
   }
+
   el.innerHTML = html;
 }
 
-// ── Settings ──
-function renderSettings() {
-  const el = document.getElementById("view-settings");
-  let html = `<div style="font-size:13px;color:#71717a;margin-bottom:16px;line-height:1.6">Customize your daily questions. Tap a question to edit it, or add new ones below.</div>`;
+function calcStreak(fn) {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    if (fn(dateKey(d))) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
 
-  Object.keys(CATEGORY_META).forEach(cat => {
-    const qs = questions.filter(q => q.category===cat);
-    if (!qs.length) return;
-    html += `<div style="margin-bottom:20px">
-      <div class="cat-label" style="color:${CATEGORY_META[cat].color}">${CATEGORY_META[cat].label}</div>`;
-    qs.forEach(q => {
-      if (editingId===q.id) {
-        html += `<div style="background:#18181b;border-radius:12px;padding:14px;margin-bottom:8px;border:1px solid #3f3f46">
-          <textarea id="edit-${q.id}" rows="2" style="width:100%;background:#27272a;border:none;border-radius:8px;padding:10px;color:#e4e4e7;font-size:13px;font-family:Georgia,serif;resize:none">${q.text}</textarea>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button data-action="save" data-id="${q.id}" style="flex:1;padding:8px;border-radius:8px;border:none;background:#4ade80;color:#052e16;font-weight:700;font-size:13px;cursor:pointer;font-family:Georgia,serif">Save</button>
-            <button data-action="cancel" style="flex:1;padding:8px;border-radius:8px;border:none;background:#27272a;color:#a1a1aa;font-weight:700;font-size:13px;cursor:pointer;font-family:Georgia,serif">Cancel</button>
-            <button data-action="delete" data-id="${q.id}" style="padding:8px 14px;border-radius:8px;border:none;background:#450a0a;color:#f87171;font-weight:700;font-size:13px;cursor:pointer;font-family:Georgia,serif">Delete</button>
-          </div>
-        </div>`;
-      } else {
-        html += `<div data-action="edit" data-id="${q.id}" style="background:#18181b;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:center;cursor:pointer;border:1px solid #27272a">
-          <span>${q.emoji}</span>
-          <span style="flex:1;font-size:13px;line-height:1.5">${q.text}</span>
-          <span style="color:#52525b;font-size:16px">›</span>
-        </div>`;
-      }
-    });
-    html += `</div>`;
+function calcWeightTrend() {
+  const result = { up:0, down:0, same:0, total:0 };
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+  Object.entries(history).forEach(([k, d]) => {
+    if (!d || !d.weighed || !d.weightDir) return;
+    if (new Date(k) < cutoff) return;
+    result[d.weightDir] = (result[d.weightDir] || 0) + 1;
+    result.total++;
   });
+  return result;
+}
 
-  html += `<div style="background:#18181b;border-radius:12px;padding:16px;border:1px solid #27272a;margin-top:8px">
-    <div style="font-size:12px;font-weight:700;color:#71717a;margin-bottom:10px;letter-spacing:1px">ADD A QUESTION</div>
-    <select id="new-cat" style="width:100%;background:#27272a;border:none;border-radius:8px;padding:10px;color:#e4e4e7;font-size:13px;font-family:Georgia,serif;margin-bottom:10px">
-      ${Object.entries(CATEGORY_META).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}
-    </select>
-    <textarea id="new-text" rows="2" placeholder="Did you…?" style="width:100%;background:#27272a;border:none;border-radius:8px;padding:10px;color:#e4e4e7;font-size:13px;font-family:Georgia,serif;resize:none;margin-bottom:10px"></textarea>
-    <button id="add-btn" style="width:100%;padding:10px;border-radius:8px;border:none;background:#27272a;color:#52525b;font-weight:700;font-size:13px;cursor:default;font-family:Georgia,serif">Add Question</button>
+function calcTriggerCounts() {
+  const counts = {};
+  Object.values(history).forEach(d => {
+    if (!d) return;
+    [...Object.values(d.meals || {}), ...(d.snacks || [])].forEach(m => {
+      if (m && m.trigger) counts[m.trigger] = (counts[m.trigger] || 0) + 1;
+    });
+  });
+  return counts;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────
+function renderSettings() {
+  const el = document.getElementById('view-settings');
+  let html = '';
+
+  html += `<div class="section-head">Running Schedule</div>`;
+  html += `<div class="card">
+    <div style="font-size:13px;color:#a1a1aa;margin-bottom:10px">Tap days to toggle your default run days.</div>
+    <div class="run-day-toggle">
+      ${DAY_NAMES.map((name, dow) =>
+        `<button class="rdt-btn ${settings.runDays.includes(dow) ? 'active' : ''}" data-action="toggleRunDay" data-dow="${dow}">${name}</button>`
+      ).join('')}
+    </div>
+  </div>`;
+
+  html += `<div class="section-head">Account</div>`;
+  html += `<div class="setting-row">
+    <div>
+      <div class="setting-label">${user.displayName || user.email}</div>
+      <div class="setting-sub">Signed in with Google</div>
+    </div>
+    <button data-action="signout" style="padding:8px 14px;border-radius:8px;border:none;background:#27272a;color:#a1a1aa;font-size:12px;cursor:pointer;font-family:Georgia,serif">Sign out</button>
+  </div>`;
+
+  html += `<div class="section-head">About</div>`;
+  html += `<div class="card" style="font-size:12px;color:#71717a;line-height:2">
+    <div>🌿 Sober since November 5, 2025</div>
+    <div>🏃 Run days: ${settings.runDays.length ? settings.runDays.map(d => DAY_NAMES[d]).join(', ') : 'none set'}</div>
+    <div>☕ Caffeine limit: 1 caffeinated drink / day</div>
+    <div style="margin-top:8px;font-size:11px;color:#3f3f46">${IS_DEV ? '⚠️ Dev mode — data saved with dev_ prefix' : 'Live mode'}</div>
   </div>`;
 
   el.innerHTML = html;
 
-  // Event delegation for edit/save/cancel/delete
-  el.addEventListener("click", async (e) => {
-    const target = e.target.closest("[data-action]");
-    if (!target) return;
-    const action = target.dataset.action;
-    const id = target.dataset.id;
-
-    if (action==="edit") { editingId=id; renderSettings(); }
-    if (action==="cancel") { editingId=null; renderSettings(); }
-    if (action==="save") {
-      const val = document.getElementById("edit-"+id).value.trim();
-      if (!val) return;
-      questions = questions.map(q => q.id===id ? {...q, text:val} : q);
-      editingId=null;
-      await saveQuestions();
+  el.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    if (btn.dataset.action === 'toggleRunDay') {
+      const dow = parseInt(btn.dataset.dow);
+      const idx = settings.runDays.indexOf(dow);
+      if (idx >= 0) settings.runDays.splice(idx, 1);
+      else settings.runDays.push(dow);
+      settings.runDays.sort((a, b) => a - b);
+      await saveSettings();
       renderSettings();
     }
-    if (action==="delete") {
-      questions = questions.filter(q => q.id!==id);
-      editingId=null;
-      await saveQuestions();
-      renderSettings();
+    if (btn.dataset.action === 'signout') {
+      if (confirm('Sign out?')) signOut(auth);
     }
-  });
-
-  el.querySelector("#new-text").addEventListener("input", e => {
-    const btn = el.querySelector("#add-btn");
-    const has = e.target.value.trim();
-    btn.style.background = has ? "#e4e4e7" : "#27272a";
-    btn.style.color      = has ? "#09090b"  : "#52525b";
-    btn.style.cursor     = has ? "pointer"  : "default";
-  });
-
-  el.querySelector("#add-btn").addEventListener("click", async () => {
-    const text = el.querySelector("#new-text").value.trim();
-    const cat  = el.querySelector("#new-cat").value;
-    if (!text) return;
-    const newQ = { id:"q"+Date.now(), category:cat, emoji:CAT_EMOJIS[cat], text };
-    questions = [...questions, newQ];
-    await saveQuestions();
-    renderSettings();
   });
 }
 </script>
