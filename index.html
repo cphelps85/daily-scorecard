@@ -239,7 +239,7 @@
 <script type="module">
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -382,6 +382,9 @@ onAuthStateChanged(auth, async (u) => {
     await loadUserData();
     renderShell();
     render();
+  } else if (IS_DEV) {
+    // file:// blocks Google OAuth — sign in anonymously for local testing
+    await signInAnonymously(auth);
   } else {
     renderLogin();
   }
@@ -431,7 +434,7 @@ function renderShell() {
             <div class="header-date">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
           </div>
           <div style="display:flex;align-items:center;gap:12px">
-            ${user.photoURL ? `<img src="${user.photoURL}" id="avatar" style="width:30px;height:30px;border-radius:50%;cursor:pointer" title="Sign out">` : ''}
+            ${user.photoURL ? `<img src="${user.photoURL}" id="avatar" style="width:30px;height:30px;border-radius:50%;cursor:pointer" title="Sign out">` : IS_DEV ? `<span style="font-size:11px;color:#e65c00;font-weight:700">DEV</span>` : ''}
             <div style="font-size:28px">✦</div>
           </div>
         </div>
@@ -830,10 +833,10 @@ function renderSettings() {
   html += `<div class="section-head">Account</div>`;
   html += `<div class="setting-row">
     <div>
-      <div class="setting-label">${user.displayName || user.email}</div>
-      <div class="setting-sub">Signed in with Google</div>
+      <div class="setting-label">${user.isAnonymous ? 'Dev / Anonymous' : (user.displayName || user.email)}</div>
+      <div class="setting-sub">${user.isAnonymous ? '⚠️ Dev mode — not your real account' : 'Signed in with Google'}</div>
     </div>
-    <button data-action="signout" style="padding:8px 14px;border-radius:8px;border:none;background:#27272a;color:#a1a1aa;font-size:12px;cursor:pointer;font-family:Georgia,serif">Sign out</button>
+    ${!user.isAnonymous ? `<button data-action="signout" style="padding:8px 14px;border-radius:8px;border:none;background:#27272a;color:#a1a1aa;font-size:12px;cursor:pointer;font-family:Georgia,serif">Sign out</button>` : ''}
   </div>`;
 
   html += `<div class="section-head">About</div>`;
