@@ -406,6 +406,18 @@ function renderShell() {
     </div>`;
   const avatar=document.getElementById('avatar');
   if(avatar) avatar.addEventListener('click',()=>{ if(confirm('Sign out?')) signOut(auth); });
+  document.getElementById('app').addEventListener('click', async e=>{
+    if(e.target.closest('[data-action="switchToToday"]')) {
+      activeDate=todayKey(); sessionStorage.setItem('sc_active_date',activeDate);
+      const snap=await getDoc(uDoc('checkins',activeDate));
+      today=snap.exists()?{...freshToday(),...snap.data()}:freshToday();
+      if(!today.meals) today.meals=freshToday().meals;
+      MEAL_SLOTS.forEach(m=>{if(!today.meals[m]) today.meals[m]={rating:null,trigger:null};});
+      if(!today.snacks) today.snacks=[];
+      if(!today.movements) today.movements=[];
+      if(currentView==='today') renderToday();
+    }
+  }, true);
   document.querySelectorAll('.nav-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       currentView=btn.dataset.view;
@@ -436,7 +448,7 @@ function renderToday() {
   if (headerDateEl) {
     if (activeDateKey() !== todayKey()) {
       const activeFmt = new Date(activeDateKey()+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-      headerDateEl.innerHTML = `<span style="color:#fbbf24">⚠️ Filling in: ${activeFmt}</span>`;
+      headerDateEl.innerHTML = `<span style="color:#fbbf24">⚠️ Filling in: ${activeFmt} — <button data-action="switchToToday" style="background:none;border:none;color:#60a5fa;font-size:12px;font-family:Georgia,serif;cursor:pointer;padding:0;text-decoration:underline">Switch to today</button></span>`;
     } else {
       headerDateEl.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
     }
@@ -638,6 +650,17 @@ function attachTodayEvents(el) {
     }
     else if (action==='confirmToday') {
       sessionStorage.setItem('sc_date_confirmed_'+todayKey(), '1');
+      renderToday(); return;
+    }
+    else if (action==='switchToToday') {
+      activeDate = todayKey();
+      sessionStorage.setItem('sc_active_date', activeDate);
+      const snap = await getDoc(uDoc('checkins', activeDate));
+      today = snap.exists() ? {...freshToday(),...snap.data()} : freshToday();
+      if(!today.meals) today.meals=freshToday().meals;
+      MEAL_SLOTS.forEach(m=>{ if(!today.meals[m]) today.meals[m]={rating:null,trigger:null}; });
+      if(!today.snacks) today.snacks=[];
+      if(!today.movements) today.movements=[];
       renderToday(); return;
     }
     else if (action==='weighed')      { today.weighed=btn.dataset.val==='true'; if(!today.weighed) today.weightDir=null; }
