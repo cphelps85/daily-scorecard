@@ -240,6 +240,7 @@ let today       = {};
 let history     = {};
 let settings    = {};
 let chatMessages = JSON.parse(localStorage.getItem('sc_chat') || '[]');
+let activeDate  = null; // the date currently being filled in on the Today tab
 
 // ── Firestore ─────────────────────────────────────────────────────────
 const uDoc = (...p) => doc(db, DB_PREFIX + 'users', user.uid, ...p);
@@ -258,6 +259,22 @@ function scoreColor(pct) {
   if (pct>=0.75) return {bg:'#14532d',text:'#4ade80',label:'Great Day', emoji:'🌟'};
   if (pct>=0.5)  return {bg:'#713f12',text:'#fbbf24',label:'Decent Day',emoji:'👍'};
   return               {bg:'#450a0a',text:'#f87171',label:'Rough Day', emoji:'💪'};
+}
+
+function activeDateKey() { return activeDate || todayKey(); }
+
+function yesterdayKey() { const d=new Date(); d.setDate(d.getDate()-1); return dateKey(d); }
+
+function initActiveDate() {
+  const stored = sessionStorage.getItem('sc_active_date');
+  const todayStr = todayKey();
+  const yesterStr = yesterdayKey();
+  if (stored && (stored === todayStr || stored === yesterStr)) {
+    activeDate = stored;
+  } else {
+    activeDate = todayStr;
+    sessionStorage.setItem('sc_active_date', activeDate);
+  }
 }
 
 function freshToday() {
@@ -295,7 +312,7 @@ async function loadUserData() {
   history = {};
   hSnap.forEach(d=>{ history[d.id]=d.data(); });
 
-  const tSnap = await getDoc(uDoc('checkins',todayKey()));
+  const tSnap = await getDoc(uDoc('checkins',activeDateKey()));
   if (tSnap.exists()) {
     today = {...freshToday(),...tSnap.data()};
     if (!today.meals) today.meals = freshToday().meals;
@@ -309,9 +326,9 @@ async function loadUserData() {
 
 async function saveToday() {
   const filled=filledItems(), total=totalItems(), pct=total>0?filled/total:0;
-  const data={...today,pct,filled,total,date:todayKey()};
-  await setDoc(uDoc('checkins',todayKey()),data);
-  history[todayKey()]=data;
+  const data={...today,pct,filled,total,date:activeDateKey()};
+  await setDoc(uDoc('checkins',activeDateKey()),data);
+  history[activeDateKey()]=data;
 }
 
 async function saveDayRun(k, val) {
@@ -328,6 +345,7 @@ onAuthStateChanged(auth, async u => {
   user = u;
   if (u) {
     showLoading('Loading your scorecard…');
+    initActiveDate();
     await loadUserData();
     renderShell();
     render();
@@ -413,6 +431,32 @@ function renderToday() {
   const el=old.cloneNode(false); old.parentNode.replaceChild(el,old);
   let html='';
 
+  // Update header date to reflect activeDate
+  const headerDateEl = document.querySelector('.header-date');
+  if (headerDateEl) {
+    if (activeDateKey() !== todayKey()) {
+      const activeFmt = new Date(activeDateKey()+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+      headerDateEl.innerHTML = `<span style="color:#fbbf24">⚠️ Filling in: ${activeFmt}</span>`;
+    } else {
+      headerDateEl.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    }
+  }
+
+  // Early-morning guard: midnight–4 AM and still on today's date
+  const nowHour = new Date().getHours();
+  if (nowHour < 4 && activeDateKey() === todayKey() && !sessionStorage.getItem('sc_date_confirmed_'+todayKey())) {
+    const nowFmt = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    const todayFmt = new Date(todayKey()+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    const yesterFmt = new Date(yesterdayKey()+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    html+=`<div style="background:#422006;border:1px solid #fbbf2444;border-radius:12px;padding:14px 16px;margin:16px 0 0;font-size:13px;color:#fbbf24;line-height:1.6">
+      ⏰ It's ${nowFmt} — are you filling in for <strong>today (${todayFmt})</strong> or <strong>yesterday (${yesterFmt})</strong>?
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="pill-btn" data-action="useYesterday" style="background:#422006;border:1px solid #fbbf2488;color:#fbbf24;flex:1">← Use Yesterday</button>
+        <button class="pill-btn" data-action="confirmToday" style="background:#18181b;border:1px solid #3f3f46;color:#71717a;flex:1">Stay on Today →</button>
+      </div>
+    </div>`;
+  }
+
   // Morning
   html+=`<div class="section-head">Morning</div>`;
   html+=`<div class="card"><div class="card-title">🧠 How are you feeling today?</div>
@@ -496,6 +540,7 @@ function renderToday() {
   html+=`<button class="submit-btn ${done?'done':allAnswered?'ready':'waiting'}" id="submit-btn" ${done||!allAnswered?'disabled':''}>
     ${done?'✓ Day logged':allAnswered?"Submit Today's Check-In":`${total-filled} items remaining…`}
   </button>`;
+  if(done) html+=`<button id="unlock-today-btn" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid #3f3f46;background:transparent;color:#71717a;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">🔓 Unlock to make changes</button>`;
   if(IS_DEV) html+=`<button id="reset-today-btn" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px dashed #e65c00;background:transparent;color:#e65c00;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">⚠️ DEV: Reset today's data</button>`;
 
   el.innerHTML=html;
@@ -576,8 +621,23 @@ function attachTodayEvents(el) {
     }
     else if (action==='toggleRunDay') {
       const k=btn.dataset.key;
-      if(k===todayKey()) { today.ran=!today.ran; await saveToday(); }
+      if(k===activeDateKey()) { today.ran=!today.ran; await saveToday(); }
       else { await saveDayRun(k, !(history[k]&&history[k].ran===true)); }
+      renderToday(); return;
+    }
+    else if (action==='useYesterday') {
+      activeDate = yesterdayKey();
+      sessionStorage.setItem('sc_active_date', activeDate);
+      const snap = await getDoc(uDoc('checkins', activeDate));
+      today = snap.exists() ? {...freshToday(),...snap.data()} : freshToday();
+      if(!today.meals) today.meals=freshToday().meals;
+      MEAL_SLOTS.forEach(m=>{ if(!today.meals[m]) today.meals[m]={rating:null,trigger:null}; });
+      if(!today.snacks) today.snacks=[];
+      if(!today.movements) today.movements=[];
+      renderToday(); return;
+    }
+    else if (action==='confirmToday') {
+      sessionStorage.setItem('sc_date_confirmed_'+todayKey(), '1');
       renderToday(); return;
     }
     else if (action==='weighed')      { today.weighed=btn.dataset.val==='true'; if(!today.weighed) today.weightDir=null; }
@@ -601,10 +661,63 @@ function attachTodayEvents(el) {
   if(submitBtn&&!today.submitted) {
     submitBtn.addEventListener('click', async ()=>{ today.submitted=true; await saveToday(); renderToday(); });
   }
+  const unlockTodayBtn=el.querySelector('#unlock-today-btn');
+  if(unlockTodayBtn) {
+    unlockTodayBtn.addEventListener('click', async ()=>{
+      if(confirm('Unlock this day to make changes? Your data will be preserved.')) {
+        today.submitted=false; await saveToday(); renderToday();
+      }
+    });
+  }
   const resetBtn=el.querySelector('#reset-today-btn');
   if(resetBtn) {
     resetBtn.addEventListener('click', async ()=>{ if(confirm("Reset all of today's data?")){ today=freshToday(); await saveToday(); renderToday(); } });
   }
+}
+
+// ── DATA MANAGEMENT ───────────────────────────────────────────────────
+async function unlockDay(k) {
+  const snap = await getDoc(uDoc('checkins', k));
+  if(!snap.exists()) return;
+  const data = {...snap.data(), submitted: false};
+  await setDoc(uDoc('checkins', k), data);
+  history[k] = data;
+  if(k === activeDateKey()) { today.submitted=false; }
+  if(currentView==='today') renderToday();
+  if(currentView==='history') renderHistory();
+}
+
+async function copyDayData(fromKey, toKey) {
+  const fromSnap = await getDoc(uDoc('checkins', fromKey));
+  if(!fromSnap.exists()) { alert('No data found for '+fromKey); return; }
+  const fromData = fromSnap.data();
+
+  // Write to target date (unlocked so she can review/edit)
+  const toData = {...fromData, date: toKey, submitted: false};
+  await setDoc(uDoc('checkins', toKey), toData);
+  history[toKey] = toData;
+
+  // Reset source date
+  const resetData = {...freshToday(), date: fromKey, pct:0, filled:0, total:totalItems()};
+  await setDoc(uDoc('checkins', fromKey), resetData);
+  history[fromKey] = resetData;
+
+  // Switch activeDate to toKey so the Today tab shows the copied (now unlocked) entry
+  activeDate = toKey;
+  sessionStorage.setItem('sc_active_date', activeDate);
+  today = {...freshToday(), ...toData};
+  if(!today.meals) today.meals=freshToday().meals;
+  MEAL_SLOTS.forEach(m=>{ if(!today.meals[m]) today.meals[m]={rating:null,trigger:null}; });
+  if(!today.snacks) today.snacks=[];
+  if(!today.movements) today.movements=[];
+
+  // Navigate to Today tab
+  currentView='today';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.nav-btn[data-view="today"]')?.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-today')?.classList.add('active');
+  renderToday();
 }
 
 // ── HISTORY ───────────────────────────────────────────────────────────
@@ -784,10 +897,17 @@ function showDayDetail(k) {
       <div style="font-size:12px;color:${col.text}">${col.label} · ${Math.round((d.pct||0)*100)}%</div></div>
     </div>
     ${rows}
+    ${d.submitted?`<button class="modal-close" id="modal-unlock-btn" style="margin-top:8px;background:#27272a;color:#f87171;">🔓 Unlock Day</button>`:''}
     <button class="modal-close">Close</button>
   </div>`;
   overlay.querySelector('.modal-close').addEventListener('click',()=>overlay.remove());
   overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
+  const unlockBtn=overlay.querySelector('#modal-unlock-btn');
+  if(unlockBtn) {
+    unlockBtn.addEventListener('click', async ()=>{
+      if(confirm(`Unlock ${k} to make changes?`)) { await unlockDay(k); overlay.remove(); }
+    });
+  }
   document.body.appendChild(overlay);
 }
 
@@ -1017,6 +1137,17 @@ function renderSettings() {
     ${!user.isAnonymous?`<button data-action="signout" style="padding:8px 14px;border-radius:8px;border:none;background:#27272a;color:#a1a1aa;font-size:12px;cursor:pointer;font-family:Georgia,serif">Sign out</button>`:''}
   </div>`;
 
+  html+=`<div class="section-head">Data Management</div>`;
+  const activeFmt = new Date(activeDateKey()+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const yesterFmt = new Date(yesterdayKey()+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  html+=`<div class="card">
+    <div style="font-size:13px;color:#a1a1aa;margin-bottom:12px;line-height:1.6">Use these if you accidentally filled in the wrong day's scorecard.</div>
+    <button data-action="copyToYesterday" style="width:100%;padding:11px;border-radius:10px;border:1px solid #f8717144;background:transparent;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif;margin-bottom:6px;">
+      📋 Copy ${activeFmt} → ${yesterFmt} + Reset ${activeFmt}
+    </button>
+    <div style="font-size:11px;color:#52525b;line-height:1.5">Copies today's data to yesterday, resets today, then switches to yesterday so you can review &amp; submit it.</div>
+  </div>`;
+
   html+=`<div class="section-head">About</div>`;
   html+=`<div class="card" style="font-size:12px;color:#71717a;line-height:2">
     <div>🌿 Sober since November 5, 2025</div>
@@ -1036,6 +1167,14 @@ function renderSettings() {
       if(idx>=0) settings.runDays.splice(idx,1); else settings.runDays.push(dow);
       settings.runDays.sort((a,b)=>a-b);
       await saveSettings(); renderSettings();
+    }
+    if(btn.dataset.action==='copyToYesterday') {
+      const yk = yesterdayKey();
+      const activeFmt = new Date(activeDateKey()+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+      const yesterFmt = new Date(yk+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+      if(confirm(`Copy ${activeFmt}'s data to ${yesterFmt}, then reset ${activeFmt}?\n\nThis will switch you to ${yesterFmt} on the Today tab so you can review and submit it.`)) {
+        await copyDayData(activeDateKey(), yk);
+      }
     }
     if(btn.dataset.action==='signout') { if(confirm('Sign out?')) signOut(auth); }
   });
