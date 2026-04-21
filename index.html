@@ -920,10 +920,10 @@ function showDayDetail(k) {
       <div style="font-size:12px;color:${col.text}">${col.label} · ${Math.round((d.pct||0)*100)}%</div></div>
     </div>
     ${rows}
-    ${d.submitted?`<button class="modal-close" id="modal-unlock-btn" style="margin-top:8px;background:#27272a;color:#f87171;">🔓 Unlock Day</button>`:''}
-    <button class="modal-close">Close</button>
+    ${d.submitted?`<button id="modal-unlock-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:#27272a;color:#f87171;font-size:13px;font-weight:700;cursor:pointer;font-family:Georgia,serif;margin-top:16px;">🔓 Unlock Day</button>`:''}
+    <button id="modal-close-btn" class="modal-close">Close</button>
   </div>`;
-  overlay.querySelector('.modal-close').addEventListener('click',()=>overlay.remove());
+  overlay.querySelector('#modal-close-btn').addEventListener('click',()=>overlay.remove());
   overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
   const unlockBtn=overlay.querySelector('#modal-unlock-btn');
   if(unlockBtn) {
