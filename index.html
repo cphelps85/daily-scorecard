@@ -1057,7 +1057,7 @@ async function sendToClaude(userMessage) {
   chatMessages.push({role:'user',content:userMessage});
   localStorage.setItem('sc_chat',JSON.stringify(chatMessages.slice(-40)));
   try {
-    const PROXY_URL = 'https://scorecard-proxy.cphelps85.workers.dev';
+    const PROXY_URL = 'https://scorecard-proxy.christina-nisun-85.workers.dev';
     const resp=await fetch(PROXY_URL,{
       method:'POST',
       headers:{
