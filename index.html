@@ -1057,13 +1057,12 @@ async function sendToClaude(userMessage) {
   chatMessages.push({role:'user',content:userMessage});
   localStorage.setItem('sc_chat',JSON.stringify(chatMessages.slice(-40)));
   try {
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const PROXY_URL = 'https://scorecard-proxy.cphelps85.workers.dev';
+    const resp=await fetch(PROXY_URL,{
       method:'POST',
       headers:{
-        'x-api-key':apiKey,
-        'anthropic-version':'2023-06-01',
         'content-type':'application/json',
-        'anthropic-dangerous-allow-browser':'true'
+        'X-Anthropic-Key':apiKey,
       },
       body:JSON.stringify({
         model:'claude-haiku-4-5-20251001',
