@@ -233,6 +233,7 @@ let history     = {};
 let settings    = {};
 let chatMessages = JSON.parse(localStorage.getItem('sc_chat') || '[]');
 let activeDate  = null; // the date currently being filled in on the Today tab
+let mealNotesExpanded = false;
 
 // ── Firestore ─────────────────────────────────────────────────────────
 const uDoc = (...p) => doc(db, DB_PREFIX + 'users', user.uid, ...p);
@@ -792,17 +793,23 @@ function renderHistory() {
   // Meal notes
   const mealNotes=buildMealNotes();
   if(mealNotes.length>0) {
-    html+=`<div class="section-head">Meal Notes</div><div class="card">
-      <div style="font-size:12px;color:#6B5E52;margin-bottom:14px">Notes on your okay / struggled meals:</div>`;
-    mealNotes.forEach(n=>{
-      const dateStr=new Date(n.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
-      const color=n.rating==='struggled'?'#8B2218':'#7A5210';
-      html+=`<div style="padding:8px 0;border-bottom:1px solid #D4CEC6;">
-        <div style="font-size:11px;color:#6B5E52;margin-bottom:3px">${dateStr} · ${n.label} · <span style="color:${color}">${n.rating}</span></div>
-        <div style="font-size:13px;color:#1C1816;line-height:1.4">${n.note}</div>
-      </div>`;
-    });
-    html+=`</div>`;
+    html+=`<div class="section-head" data-action="toggleMealNotes" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+      <span>Meal Notes</span>
+      <span style="font-size:11px;font-weight:400;color:#6B5E52">${mealNotesExpanded?'▲ hide':`▼ ${mealNotes.length} note${mealNotes.length!==1?'s':''}`}</span>
+    </div>`;
+    if(mealNotesExpanded) {
+      html+=`<div class="card">
+        <div style="font-size:12px;color:#6B5E52;margin-bottom:14px">Notes on your okay / struggled meals:</div>`;
+      mealNotes.forEach(n=>{
+        const dateStr=new Date(n.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        const color=n.rating==='struggled'?'#8B2218':'#7A5210';
+        html+=`<div style="padding:8px 0;border-bottom:1px solid #D4CEC6;">
+          <div style="font-size:11px;color:#6B5E52;margin-bottom:3px">${dateStr} · ${n.label} · <span style="color:${color}">${n.rating}</span></div>
+          <div style="font-size:13px;color:#1C1816;line-height:1.4">${n.note}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
   }
 
   // Range selector + habit grid
@@ -836,8 +843,9 @@ function renderHistory() {
   el.addEventListener('click', e=>{
     const btn=e.target.closest('[data-action]');
     if(!btn) return;
-    if(btn.dataset.action==='setRange') { histRange=parseInt(btn.dataset.val); renderHistory(); }
-    if(btn.dataset.action==='showDay')  { showDayDetail(btn.dataset.key); }
+    if(btn.dataset.action==='setRange')        { histRange=parseInt(btn.dataset.val); renderHistory(); }
+    if(btn.dataset.action==='toggleMealNotes') { mealNotesExpanded=!mealNotesExpanded; renderHistory(); }
+    if(btn.dataset.action==='showDay')         { showDayDetail(btn.dataset.key); }
   });
 }
 
