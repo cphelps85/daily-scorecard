@@ -183,7 +183,7 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs }
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -947,8 +947,17 @@ function showDayDetail(k) {
       : `<button id="modal-unlock-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:#D6E8FA;color:#1A4E8A;font-size:13px;font-weight:700;cursor:pointer;font-family:Georgia,serif;margin-top:16px;">✏️ Edit Day</button>`
     }
     <button id="modal-close-btn" class="modal-close">Close</button>
+    <button id="modal-delete-btn" style="width:100%;margin-top:6px;padding:10px;border-radius:10px;border:none;background:transparent;color:#9A8878;font-size:11px;cursor:pointer;font-family:Georgia,serif;">Delete this day's data</button>
   </div>`;
   overlay.querySelector('#modal-close-btn').addEventListener('click',()=>overlay.remove());
+  overlay.querySelector('#modal-delete-btn').addEventListener('click', async ()=>{
+    if(confirm(`Permanently delete data for ${dateStr}? This can't be undone.`)) {
+      await deleteDoc(uDoc('checkins', k));
+      delete history[k];
+      overlay.remove();
+      renderHistory();
+    }
+  });
   overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
   const unlockBtn=overlay.querySelector('#modal-unlock-btn');
   if(unlockBtn) {
