@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -282,7 +282,7 @@ function freshToday() {
     mood:null, dayPlanned:null, caffeine:0,
     meals:{ Breakfast:{rating:null,trigger:null}, Lunch:{rating:null,trigger:null}, Dinner:{rating:null,trigger:null} },
     snacks:[], movements:[], ran:null,
-    executedPlan:null, homeOrg:null,
+    executedPlan:null,
     weighed:null, weightDir:null,
     wentWell:'', couldImprove:'',
     submitted:false,
@@ -295,12 +295,11 @@ function filledItems() {
   if (today.dayPlanned!==null)   n++;
   if (today.caffeine!==null)     n++;
   MEAL_SLOTS.forEach(m=>{ if(today.meals[m].rating!==null) n++; });
-  if (today.homeOrg!==null)      n++;
   if (today.weighed!==null)      n++;
   if (today.executedPlan!==null) n++;
   return n;
 }
-function totalItems() { return 3 + MEAL_SLOTS.length + 3; } // mood,planned,caff + 3meals + homeOrg,weighed,executedPlan
+function totalItems() { return 3 + MEAL_SLOTS.length + 2; } // mood,planned,caff + 3meals + weighed,executedPlan
 
 // ── Load / Save ───────────────────────────────────────────────────────
 async function loadUserData() {
@@ -532,13 +531,6 @@ function renderToday() {
       <button class="yn-btn ${today.executedPlan===false?'no-active':''}" data-action="executedPlan" data-val="false">✗ No</button>
     </div>
   </div>`;
-  html+=`<div class="card"><div class="card-title">🏠 Did you do something to keep your space organized?</div>
-    <div class="yn-row">
-      <button class="yn-btn ${today.homeOrg===true?'yes-active':''}" data-action="homeOrg" data-val="true">✓ Yes</button>
-      <button class="yn-btn ${today.homeOrg===false?'no-active':''}" data-action="homeOrg" data-val="false">✗ No</button>
-    </div>
-  </div>`;
-
   // Reflection (optional)
   html+=`<div class="card"><div class="card-title">📝 Reflection <span style="font-size:11px;color:#52525b;font-weight:400;margin-left:4px">optional</span></div>
     <div style="font-size:12px;color:#71717a;margin-bottom:2px">One thing that went well</div>
@@ -568,8 +560,9 @@ function renderMealCard(meal,data) {
       <button class="scale-btn ${rating==='okay'?'okay':''}" data-action="mealRating" data-meal="${meal}" data-val="okay">🟡 Okay</button>
       <button class="scale-btn ${rating==='struggled'?'struggled':''}" data-action="mealRating" data-meal="${meal}" data-val="struggled">🔴 Struggled</button>
     </div>
-    ${rating&&rating!=='good'?`<div class="trigger-row"><div class="trigger-label">What was going on?</div>
-      ${TRIGGERS.map(t=>`<button class="trigger-chip ${trigger===t?'active':''}" data-action="mealTrigger" data-meal="${meal}" data-val="${t}">${t}</button>`).join('')}
+    ${rating&&rating!=='good'?`<div class="trigger-row">
+      <div class="trigger-label">What was going on?</div>
+      <textarea class="reflect-input" rows="2" style="margin-top:6px" data-mealtext="${meal}" placeholder="What was happening in that moment…">${trigger||''}</textarea>
     </div>`:''}
   </div>`;
 }
@@ -582,8 +575,9 @@ function renderSnackCard(snack,idx) {
       <button class="scale-btn ${rating==='okay'?'okay':''}" data-action="snackRating" data-idx="${idx}" data-val="okay">🟡 Okay</button>
       <button class="scale-btn ${rating==='struggled'?'struggled':''}" data-action="snackRating" data-idx="${idx}" data-val="struggled">🔴 Struggled</button>
     </div>
-    ${rating&&rating!=='good'?`<div class="trigger-row"><div class="trigger-label">What was going on?</div>
-      ${TRIGGERS.map(t=>`<button class="trigger-chip ${trigger===t?'active':''}" data-action="snackTrigger" data-idx="${idx}" data-val="${t}">${t}</button>`).join('')}
+    ${rating&&rating!=='good'?`<div class="trigger-row">
+      <div class="trigger-label">What was going on?</div>
+      <textarea class="reflect-input" rows="2" style="margin-top:6px" data-snacktext="${idx}" placeholder="What was happening in that moment…">${trigger||''}</textarea>
     </div>`:''}
   </div>`;
 }
@@ -621,9 +615,7 @@ function attachTodayEvents(el) {
     else if (action==='caffInc')      { today.caffeine=(today.caffeine||0)+1; }
     else if (action==='caffDec')      { today.caffeine=Math.max(0,(today.caffeine||0)-1); }
     else if (action==='mealRating')   { today.meals[btn.dataset.meal].rating=btn.dataset.val; today.meals[btn.dataset.meal].trigger=null; }
-    else if (action==='mealTrigger')  { today.meals[btn.dataset.meal].trigger=btn.dataset.val; }
     else if (action==='snackRating')  { const i=parseInt(btn.dataset.idx); today.snacks[i].rating=btn.dataset.val; today.snacks[i].trigger=null; }
-    else if (action==='snackTrigger') { today.snacks[parseInt(btn.dataset.idx)].trigger=btn.dataset.val; }
     else if (action==='addSnack')     { today.snacks.push({rating:null,trigger:null}); }
     else if (action==='removeSnack')  { today.snacks.splice(parseInt(btn.dataset.idx),1); }
     else if (action==='toggleMove')   {
@@ -666,15 +658,28 @@ function attachTodayEvents(el) {
     else if (action==='weighed')      { today.weighed=btn.dataset.val==='true'; if(!today.weighed) today.weightDir=null; }
     else if (action==='weightDir')    { today.weightDir=btn.dataset.val; }
     else if (action==='executedPlan') { today.executedPlan=btn.dataset.val==='true'; }
-    else if (action==='homeOrg')      { today.homeOrg=btn.dataset.val==='true'; }
     await saveToday(); renderToday();
   });
 
-  // Reflection textareas (debounced save)
+  // Reflection + meal/snack note textareas (debounced save)
   let reflectTimer;
   el.querySelectorAll('textarea[data-reflect]').forEach(ta=>{
-    ta.addEventListener('input', e=>{
+    ta.addEventListener('input', ()=>{
       today[ta.dataset.reflect]=ta.value;
+      clearTimeout(reflectTimer);
+      reflectTimer=setTimeout(saveToday, 800);
+    });
+  });
+  el.querySelectorAll('textarea[data-mealtext]').forEach(ta=>{
+    ta.addEventListener('input', ()=>{
+      today.meals[ta.dataset.mealtext].trigger=ta.value;
+      clearTimeout(reflectTimer);
+      reflectTimer=setTimeout(saveToday, 800);
+    });
+  });
+  el.querySelectorAll('textarea[data-snacktext]').forEach(ta=>{
+    ta.addEventListener('input', ()=>{
+      today.snacks[parseInt(ta.dataset.snacktext)].trigger=ta.value;
       clearTimeout(reflectTimer);
       reflectTimer=setTimeout(saveToday, 800);
     });
@@ -792,14 +797,18 @@ function renderHistory() {
     </div>`;
   }
 
-  // Trigger chart
-  const triggers=calcTriggerCounts();
-  if(Object.keys(triggers).length>0) {
-    html+=`<div class="section-head">Eating Pattern Triggers</div><div class="card">
-      <div style="font-size:12px;color:#71717a;margin-bottom:14px">When you rated a meal or snack Okay / Struggled:</div>`;
-    const max=Math.max(...Object.values(triggers));
-    Object.entries(triggers).sort((a,b)=>b[1]-a[1]).forEach(([t,c])=>{
-      html+=`<div class="trigger-bar-row"><div class="trigger-bar-label">${t}</div><div class="trigger-bar-track"><div class="trigger-bar-fill" style="width:${max>0?Math.round(c/max*100):0}%"></div></div><div class="trigger-bar-count">${c}</div></div>`;
+  // Meal notes
+  const mealNotes=buildMealNotes();
+  if(mealNotes.length>0) {
+    html+=`<div class="section-head">Meal Notes</div><div class="card">
+      <div style="font-size:12px;color:#71717a;margin-bottom:14px">Notes on your okay / struggled meals:</div>`;
+    mealNotes.forEach(n=>{
+      const dateStr=new Date(n.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const color=n.rating==='struggled'?'#f87171':'#fbbf24';
+      html+=`<div style="padding:8px 0;border-bottom:1px solid #27272a;">
+        <div style="font-size:11px;color:#52525b;margin-bottom:3px">${dateStr} · ${n.label} · <span style="color:${color}">${n.rating}</span></div>
+        <div style="font-size:13px;color:#d4d4d8;line-height:1.4">${n.note}</div>
+      </div>`;
     });
     html+=`</div>`;
   }
@@ -980,10 +989,14 @@ function calcWeightTrend() {
   Object.entries(history).forEach(([k,d])=>{ if(!d||!d.weighed||!d.weightDir) return; if(new Date(k)<cutoff) return; r[d.weightDir]=(r[d.weightDir]||0)+1; r.total++; });
   return r;
 }
-function calcTriggerCounts() {
-  const counts={};
-  Object.values(history).forEach(d=>{ if(!d) return; [...Object.values(d.meals||{}),...(d.snacks||[])].forEach(m=>{ if(m?.trigger) counts[m.trigger]=(counts[m.trigger]||0)+1; }); });
-  return counts;
+function buildMealNotes() {
+  const notes=[];
+  Object.keys(history).sort().reverse().slice(0,14).forEach(k=>{
+    const d=history[k]; if(!d) return;
+    MEAL_SLOTS.forEach(m=>{ const entry=d.meals?.[m]; if(entry?.rating&&entry.rating!=='good'&&entry.trigger) notes.push({date:k,label:m,rating:entry.rating,note:entry.trigger}); });
+    (d.snacks||[]).forEach((s,i)=>{ if(s?.rating&&s.rating!=='good'&&s.trigger) notes.push({date:k,label:`Snack ${i+1}`,rating:s.rating,note:s.trigger}); });
+  });
+  return notes.slice(0,10);
 }
 
 // ── CLAUDE / INSIGHTS ─────────────────────────────────────────────────
@@ -999,13 +1012,6 @@ function buildInsights() {
   const runsThisWeek=weekKeys().filter(k=>history[k]&&history[k].ran===true).length;
   if(runsThisWeek>=settings.runDays.length) insights.push({icon:'🏃',text:`You hit all ${settings.runDays.length} runs this week. That's a great week!`});
   else if(runsThisWeek===0) insights.push({icon:'🏃',text:`No runs logged yet this week. You've got time — what's getting in the way?`});
-
-  // Top trigger
-  const triggers=calcTriggerCounts();
-  if(Object.keys(triggers).length>0) {
-    const top=Object.entries(triggers).sort((a,b)=>b[1]-a[1])[0];
-    insights.push({icon:'🍽️',text:`Your most common eating trigger is <strong>${top[0]}</strong> (${top[1]} times). Noticing that is the first step.`});
-  }
 
   // Mood trend
   const recentMoods=weekKeys().map(k=>history[k]?.mood).filter(m=>m!==null&&m!==undefined);
@@ -1030,7 +1036,7 @@ function buildContext() {
     const meals=MEAL_SLOTS.map(m=>`${m}:${d.meals?.[m]?.rating||'?'}${d.meals?.[m]?.trigger?`(${d.meals[m].trigger})`:''}`).join(',');
     const snacks=(d.snacks||[]).map(s=>`snack:${s.rating||'?'}${s.trigger?`(${s.trigger})`:''}`).join(',');
     const moves=(d.movements||[]).join(',');
-    return `${k}|mood:${d.mood!==null?MOOD_LABELS[d.mood]:'?'}|planned:${d.dayPlanned??'?'}|executed:${d.executedPlan??'?'}|caff:${d.caffeine??'?'}|${meals}${snacks?`|${snacks}`:''}|ran:${d.ran??'?'}|moves:${moves||'none'}|weighed:${d.weighed??'?'}${d.weightDir?`(${d.weightDir})`:''}|home:${d.homeOrg??'?'}|wentWell:"${d.wentWell||''}"|improve:"${d.couldImprove||''}"`;
+    return `${k}|mood:${d.mood!==null?MOOD_LABELS[d.mood]:'?'}|planned:${d.dayPlanned??'?'}|executed:${d.executedPlan??'?'}|caff:${d.caffeine??'?'}|${meals}${snacks?`|${snacks}`:''}|ran:${d.ran??'?'}|moves:${moves||'none'}|weighed:${d.weighed??'?'}${d.weightDir?`(${d.weightDir})`:''}|wentWell:"${d.wentWell||''}"|improve:"${d.couldImprove||''}"`;
   }).filter(Boolean);
   return lines.join('\n');
 }
@@ -1043,7 +1049,7 @@ function getSystemPrompt() {
 - She runs Wed/Fri/Sun (her current target days: ${settings.runDays.map(d=>DAY_NAMES[d]).join(', ')})
 - She's tracking meal quality (not food logging — just Good/Okay/Struggled) with emotional triggers
 - Goal: lose weight, feel energized, improve blood work
-- Also tracking mental health, home organization, and daily planning
+- Also tracking mental health and daily planning habits
 
 Her last 14 days of data:
 ${buildContext()}
